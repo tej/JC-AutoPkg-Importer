@@ -703,33 +703,33 @@ installer -pkg "/tmp/{0}" -target /
 systemGroupID="{2}"
 systemGroupPostID="{3}"
 userAgent="{4}"
-JCAPIKey="{5}"
-JCOrgID="{6}"
+JCAPIKey='{5}'
+JCOrgID'{6}'
 
 # Parse the systemKey from the conf file.
 conf="$(cat /opt/jc/jcagent.conf)"
-regex='"systemKey":"[a-zA-Z0-9]{24}"'
+regex='\"systemKey\":\"[a-zA-Z0-9]{{24}}\"'
 
 if [[ $conf =~ $regex ]]; then
-	systemKey="${BASH_REMATCH[@]}"
+    systemKey="${{BASH_REMATCH[@]}}"
 fi
 
-regex='[a-zA-Z0-9]{24}'
+regex='[a-zA-Z0-9]{{24}}'
 if [[ $systemKey =~ $regex ]]; then
-	systemID="${BASH_REMATCH[@]}"
+    systemID="${{BASH_REMATCH[@]}}"
 fi
 
 # Get the current time.
 now=$(date -u "+%a, %d %h %Y %H:%M:%S GMT")
 
 curl -s \
-	-X 'POST' \
-	-H 'Content-Type: application/json' \
-	-H 'Accept: application/json' \
-	-H "Date: ${now}" \
-	-H 'x-api-key: '${JCAPIKey}'' \
-  	-H 'x-org-id: '${JCOrgID}'' \
-	-d '{"op": "remove","type": "system","id": "'${systemID}'"}' \
+    -X 'POST' \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -H "Date: ${now}" \
+    -H 'x-api-key: '${JCAPIKey}'' \
+    -H 'x-org-id: '${JCOrgID}'' \
+    -d '{"op": "remove","type": "system","id": "'${systemID}'"}' \
         "https://console.jumpcloud.com/api/v2/systemgroups/${systemGroupID}/members"
 
 echo "JumpCloud system: ${systemID} removed from system group: ${systemGroupID}"
@@ -744,14 +744,14 @@ signstr="POST /api/v2/systemgroups/${systemGroupPostID}/members HTTP/1.1\ndate: 
 signature=$(printf "$signstr" | openssl dgst -sha256 -sign /opt/jc/client.key | openssl enc -e -a | tr -d '\n')
 
 curl -s \
-	-X 'POST' \
-	-H 'Content-Type: application/json' \
-	-H 'Accept: application/json' \
-	-H "Date: ${now}" \
-	-H 'x-api-key: '${JCAPIKey}'' \
-  	-H 'x-org-id: '${JCOrgID}'' \
-	-d '{"op": "add","type": "system","id": "'${systemID}'"}' \
-		"https://console.jumpcloud.com/api/v2/systemgroups/${systemGroupPostID}/members"
+    -X 'POST' \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -H "Date: ${now}" \
+    -H 'x-api-key: '${JCAPIKey}'' \
+    -H 'x-org-id: '${JCOrgID}'' \
+    -d '{"op": "add","type": "system","id": "'${systemID}'"}' \
+        "https://console.jumpcloud.com/api/v2/systemgroups/${systemGroupPostID}/members"
 
 echo "JumpCloud system: ${systemID} added to post install system group: ${systemGroupPostID}"
 exit 0
