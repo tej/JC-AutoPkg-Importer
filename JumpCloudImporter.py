@@ -704,7 +704,7 @@ systemGroupID="{2}"
 systemGroupPostID="{3}"
 userAgent="{4}"
 JCAPIKey='{5}'
-JCOrgID'{6}'
+JCOrgID='{6}'
 
 # Parse the systemKey from the conf file.
 conf="$(cat /opt/jc/jcagent.conf)"
@@ -722,38 +722,29 @@ fi
 # Get the current time.
 now=$(date -u "+%a, %d %h %Y %H:%M:%S GMT")
 
-curl -s \
-    -X 'POST' \
-    -H 'Content-Type: application/json' \
-    -H 'Accept: application/json' \
-    -H "Date: ${now}" \
-    -H 'x-api-key: '${JCAPIKey}'' \
-    -H 'x-org-id: '${JCOrgID}'' \
-    -d '{"op": "remove","type": "system","id": "'${systemID}'"}' \
-        "https://console.jumpcloud.com/api/v2/systemgroups/${systemGroupID}/members"
+curl -s \\
+    -X 'POST' \\
+    -H 'Content-Type: application/json' \\
+    -H 'Accept: application/json' \\
+    -H "Date: ${{now}}" \\
+    -H 'x-api-key: '${{JCAPIKey}}'' \\
+    -H 'x-org-id: '${{JCOrgID}}'' \\
+    -d '{{"op": "remove","type": "system","id": "'${{systemID}}'"}}' \\
+        "https://console.jumpcloud.com/api/v2/systemgroups/${{systemGroupID}}/members"
 
-echo "JumpCloud system: ${systemID} removed from system group: ${systemGroupID}"
+echo "JumpCloud system: ${{systemID}} removed from system group: ${{systemGroupID}}"
 
-# Get the current time.
-now=$(date -u "+%a, %d %h %Y %H:%M:%S GMT")
+curl -s \\
+    -X 'POST' \\
+    -H 'Content-Type: application/json' \\
+    -H 'Accept: application/json' \\
+    -H "Date: ${{now}}" \\
+    -H 'x-api-key: '${{JCAPIKey}}'' \\
+    -H 'x-org-id: '${{JCOrgID}}'' \\
+    -d '{{"op": "add","type": "system","id": "'${{systemID}}'"}}' \\
+        "https://console.jumpcloud.com/api/v2/systemgroups/${{systemGroupPostID}}/members"
 
-# create the string to sign from the request-line and the date
-signstr="POST /api/v2/systemgroups/${systemGroupPostID}/members HTTP/1.1\ndate: ${now}"
-
-# create the signature
-signature=$(printf "$signstr" | openssl dgst -sha256 -sign /opt/jc/client.key | openssl enc -e -a | tr -d '\n')
-
-curl -s \
-    -X 'POST' \
-    -H 'Content-Type: application/json' \
-    -H 'Accept: application/json' \
-    -H "Date: ${now}" \
-    -H 'x-api-key: '${JCAPIKey}'' \
-    -H 'x-org-id: '${JCOrgID}'' \
-    -d '{"op": "add","type": "system","id": "'${systemID}'"}' \
-        "https://console.jumpcloud.com/api/v2/systemgroups/${systemGroupPostID}/members"
-
-echo "JumpCloud system: ${systemID} added to post install system group: ${systemGroupPostID}"
+echo "JumpCloud system: ${{systemID}} added to post install system group: ${{systemGroupPostID}}"
 exit 0
 ''')
         userAgent = "JumpCloud_" + "autopkg-importer/" + __version__
