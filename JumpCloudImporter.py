@@ -405,17 +405,19 @@ class JumpCloudImporter(Processor):
             allSystems = []
             condition = True
             searchInt = 0
-
+            noOfAppleSystems = 0
             while condition:
                 systems = SI_SYSTEMS.systeminsights_list_system_info(
                     self.CONTENT_TYPE, self.ACCEPT, x_org_id=self.ORG_ID, limit=100, skip=searchInt)
                 for i in systems:
                     if i._hardware_vendor.strip() == 'Apple Inc.':
+                        noOfAppleSystems = noOfAppleSystems+1
                         # create list of systems which have system insights data
                         allSystems.append(i.system_id)
-                    searchInt += 100
-                    if len(systems) != 100:
-                        condition = False
+                searchInt += 100
+                if len(systems) != 100:
+                    condition = False
+            self.output('Number of Apple Devices: ' + str(noOfAppleSystems))
         except ApiException as err:
             print(
                 "Exception when calling SystemInsightsApi->systeminsights_list_system_info %s\n" % err)
@@ -525,7 +527,7 @@ class JumpCloudImporter(Processor):
             id=system, op="add", type="system")
         try:
             systemGroupMember = JC_SYS_GROUP.graph_system_group_membership(
-                group_id, self.CONTENT_TYPE, self.ACCEPT, x_org_id=self.ORG_ID)
+                group_id, self.CONTENT_TYPE, self.ACCEPT, x_org_id=self.ORG_ID,limit=100)
             for i in systemGroupMember:
                 composite.append(i.id)
             if system not in composite:
