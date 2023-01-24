@@ -527,7 +527,7 @@ class JumpCloudImporter(Processor):
             id=system, op="add", type="system")
         try:
             systemGroupMember = JC_SYS_GROUP.graph_system_group_membership(
-                group_id, self.CONTENT_TYPE, self.ACCEPT, x_org_id=self.ORG_ID)
+                group_id, self.CONTENT_TYPE, self.ACCEPT, x_org_id=self.ORG_ID,limit=100)
             for i in systemGroupMember:
                 composite.append(i.id)
             if system not in composite:
